@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Environment variables
+export ROOT_DIR=$(dirname `realpath $0`)
+export CONFIG_DIR=$ROOT_DIR/config
+export CONFIG_FILE=$CONFIG_DIR/yarvis.conf
+
+source $CONFIG_FILE
+
+# Main
+if [[ $# -lt 1 ]]; then
+    echo 'Usage'
+else
+    case $1 in
+	'scaffold')
+	    $SCRIPTS_DIR/$1 ${@:2}
+	    ;;
+	*)
+	    echo >&2 'Invalid command:' $1;
+	    exit 1
+	    ;;
+    esac
+fi
+
+
+

@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Variables
+GIT=false
+
+# Usage
+usage() {
+    echo 'scaffold [-g] <project_name> <language>'
+}
+
+# Scaffolding functions
+scaffold_c() {
+    mkdir -p include src
+    cp $TEMPLATES_DIR/c/main.c src
+    echo 'Done scaffolding C'
+}
+scaffold_cpp() {
+    mkdir -p include src
+    echo 'Done scaffolding C++'
+}
+
+# Main
+if [[ $# -lt 2 ]]; then
+    usage; exit 1
+else
+    while getopts 'g' opt; do
+	echo 'getopts parsing'
+	case $opt in
+	    'g')
+		GIT=true
+		;;
+	    *)
+		echo >&2 'Invalid option:' $opt
+		exit 1
+		;;
+	esac
+    done
+    shift $((OPTIND-1))
+    case $2 in
+        'c'|'cpp')
+	    if [[ -d $1 ]]; then
+		read -p 'Warning! Folder already exists. Proceed? (y/N) ' answer
+		case ${answer:0:1} in
+		    'y'|'Y')
+			;;
+		    *)
+			exit 0
+			;;
+		esac
+	    fi
+	    mkdir -p $1 && cd $1 || exit 2
+	    echo $2 > .yarvis
+	    scaffold_$2
+	    if [[ $GIT == true ]]; then
+		git init
+		echo "Don't forget to add your remote after creating the repository!"
+	    fi
+            ;;
+        *)
+            echo >&2 'Invalid language:' $2;
+            exit 1
+            ;;
+    esac
+fi
